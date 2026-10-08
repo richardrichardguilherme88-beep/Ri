@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja de Jogos — Richard 2000</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Tahoma", "MS Sans Serif", sans-serif; }
+        body {
+            background: #2E649E; /* Azul clássico do Windows 2000 */
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        /* Janela Windows 2000 — mais lisa, cores diferentes */
+        .janela {
+            background: #ECE9D8;
+            border: 2px solid #ACA899;
+            max-width: 780px;
+            margin: 0 auto;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.4);
+        }
+        .barra-titulo {
+            background: linear-gradient(180deg, #0A246A 0%, #153584 100%);
+            color: white;
+            padding: 5px 10px;
+            font-weight: bold;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .botoes-janela { display: flex; gap: 4px; }
+        .btn-janela {
+            width: 21px; height: 21px;
+            background: #ECE9D8;
+            border: 1px solid #ACA899;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        .btn-janela:hover { background: #D4D0C8; }
+
+        .menu {
+            padding: 4px 6px;
+            border-bottom: 1px solid #ACA899;
+            font-size: 12px;
+            background: #ECE9D8;
+        }
+        .menu span { padding: 3px 10px; cursor: pointer; border-radius: 2px; }
+        .menu span:hover { background: #316AC5; color: white; }
+
+        .pesquisa {
+            padding: 12px;
+            border-bottom: 1px solid #ACA899;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            background: #F5F4EA;
+        }
+        .pesquisa input {
+            flex: 1;
+            min-width: 220px;
+            padding: 6px;
+            border: 1px solid #7F9DB9;
+            font-size: 13px;
+            background: white;
+        }
+        .btn {
+            padding: 6px 18px;
+            background: #ECE9D8;
+            border: 1px solid #7F9DB9;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+        .btn:hover { background: #D4D0C8; }
+
+        .conteudo { padding: 15px; background: #FFFFFF; min-height: 300px; }
+        .grade {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 18px;
+        }
+        .jogo {
+            background: #F8F8F8;
+            border: 1px solid #CCCCCC;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        .jogo:hover {
+            border-color: #316AC5;
+            background: #E8F0FC;
+            transform: translateY(-2px);
+        }
+        .jogo-emoji { font-size: 42px; margin-bottom: 8px; }
+        .jogo-nome { font-weight: bold; font-size: 14px; margin-bottom: 6px; color: #0A246A; }
+        .jogo-preco { color: #008000; font-weight: bold; font-size: 13px; margin-bottom: 12px; }
+        
+        .btn-selecionar {
+            padding: 5px 15px;
+            background: #ECE9D8;
+            border: 1px solid #7F9DB9;
+            font-size: 12px;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 2px;
+        }
+        .btn-selecionar:hover { background: #D4D0C8; }
+        .btn-selecionar.selecionado {
+            background: #0066CC;
+            color: white;
+            border-color: #004C99;
+        }
+
+        .area-play {
+            margin-top: 25px;
+            padding: 20px;
+            border-top: 1px solid #CCCCCC;
+            text-align: center;
+            display: none;
+            background: #F0F6FF;
+            border-radius: 4px;
+        }
+        .btn-play {
+            padding: 14px 50px;
+            background: linear-gradient(180deg, #4CD964 0%, #2E9B3F 100%);
+            border: 2px solid #1E702C;
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        .btn-play:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(76,217,100,0.5);
+        }
+
+        .rodape {
+            padding: 8px 12px;
+            border-top: 1px solid #ACA899;
+            font-size: 11px;
+            color: #666666;
+            background: #ECE9D8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="janela">
+    <div class="barra-titulo">
+        🎮 Loja de Jogos — Richard 2000
+        <div class="botoes-janela">
+            <button class="btn-janela">_</button>
+            <button class="btn-janela">□</button>
+            <button class="btn-janela">×</button>
+        </div>
+    </div>
+
+    <div class="menu">
+        <span>Arquivo</span>
+        <span>Exibir</span>
+        <span>Favoritos</span>
+        <span>Ajuda</span>
+    </div>
+
+    <div class="pesquisa">
+        <input type="text" id="busca" placeholder="🔍 Pesquisar jogo...">
+        <button class="btn" onclick="pesquisar()">Ir</button>
+        <button class="btn" onclick="limpar()">Mostrar Todos</button>
+    </div>
+
+    <div class="conteudo">
+        <div class="grade" id="lista-jogos">
+            <div class="jogo" data-nome="Aventura 2000">
+                <div class="jogo-emoji">🏃</div>
+                <div class="jogo-nome">Aventura 2000</div>
+                <div class="jogo-preco">Grátis ✅</div>
+                <button class="btn-selecionar" onclick="selecionar(this)">Escolher</button>
+            </div>
+            <div class="jogo" data-nome="Robô Guerreiro">
+                <div class="jogo-emoji">🤖</div>
+                <div class="jogo-nome">Robô Guerreiro</div>
+                <div class="jogo-preco">Grátis ✅</div>
+                <button class="btn-selecionar" onclick="selecionar(this)">Escolher</button>
+            </div>
+            <div class="jogo" data-nome="Plataforma Master">
+                <div class="jogo-emoji">⬆️</div>
+                <div class="jogo-nome">Plataforma Master</div>
+                <div class="jogo-preco">Grátis ✅</div>
+                <button class="btn-selecionar" onclick="selecionar(this)">Escolher</button>
+            </div>
+            <div class="jogo" data-nome="Exploração Espacial">
+                <div class="jogo-emoji">🚀</div>
+                <div class="jogo-nome">Espaço 2000</div>
+                <div class="jogo-preco">Grátis ✅</div>
+                <button class="btn-selecionar" onclick="selecionar(this)">Escolher</button>
+            </div>
+            <div class="jogo" data-nome="Guardião do Planeta">
+                <div class="jogo-emoji">🌍</div>
+                <div class="jogo-nome">Guardião do Mundo</div>
+                <div class="jogo-preco">Grátis ✅</div>
+                <button class="btn-selecionar" onclick="selecionar(this)">Escolher</button>
+            </div>
+            <div class="jogo" data-nome="Super Herói">
+                <div class="jogo-emoji">🦸</div>
+                <div class="jogo-nome">Super Herói</div>
+                <div class="jogo-preco">Grátis ✅</div>
+                <button class="btn-selecionar" onclick="selecionar(this)">Escolher</button>
+            </div>
+            <div class="jogo" data-nome="Corrida 2000">
+                <div class="jogo-emoji">🏎️</div>
+                <div class="jogo-nome">Corrida 2000</div>
+                <div class="jogo-preco">Grátis ✅</div>
+                <button class="btn-selecionar" onclick="selecionar(this)">Escolher</button>
+            </div>
+            <div class="jogo" data-nome="Labirinto Mágico">
+                <div class="jogo-emoji">🌀</div>
+                <div class="jogo-nome">Labirinto Mágico</div>
+                <div class="jogo-preco">Grátis ✅</div>
+                <button class="btn-selecionar" onclick="selecionar(this)">Escolher</button>
+            </div>
+        </div>
+
+        <div class="area-play" id="areaPlay">
+            <p style="margin-bottom: 15px; font-weight: bold; font-size: 15px; color: #0A246A;">✨ Jogo selecionado com sucesso! ✨</p>
+            <button class="btn-play" onclick="jogar()">▶️ JOGAR AGORA</button>
+        </div>
+    </div>
+
+    <div class="rodape">
+        © 2000 Richard — Loja de Jogos | Tudo seu 💙✨
+    </div>
+</div>
+
+<script>
+function selecionar(botao) {
+    // Tirar seleção de todos
+    document.querySelectorAll('.btn-selecionar').forEach(btn => {
+        btn.classList.remove('selecionado');
+        btn.innerText = 'Escolher';
+    });
+    
+    // Marcar o escolhido
+    botao.classList.add('selecionado');
+    botao.innerText = '✓ Selecionado!';
+    
+    // Mostrar botão PLAY
+    document.getElementById('areaPlay').style.display = 'block';
+    // Rola até o botão
+    document.getElementById('areaPlay').scrollIntoView({behavior: 'smooth'});
+}
+
+function jogar() {
+    // Para onde vai — pode mudar!
+    window.location.href = 'index4.html';
+}
+
+function pesquisar() {
+    const termo = document.getElementById('busca').value.toLowerCase().trim();
+    const jogos = document.querySelectorAll('.jogo');
+    let encontrados = 0;
+
+    jogos.forEach(jogo => {
+        const nome = jogo.getAttribute('data-nome').toLowerCase();
+        if (termo === '' || nome.includes(termo)) {
+            jogo.style.display = 'block';
+            encontrados++;
+        } else {
+            jogo.style.display = 'none';
+        }
+    });
+}
+
+function limpar() {
+    document.getElementById('busca').value = '';
+    document.querySelectorAll('.jogo').forEach(jogo => {
+        jogo.style.display = 'block';
+    });
+}
+
+document.getElementById('busca').addEventListener('keypress', e => {
+    if (e.key === 'Enter') pesquisar();
+});
+</script>
+
+</body>
+</html>

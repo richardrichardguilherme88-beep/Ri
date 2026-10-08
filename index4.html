@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo do Robô — Richard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Tahoma", sans-serif; }
+        body {
+            background: #008080;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: white;
+            text-shadow: 2px 2px 0 black;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .placar {
+            background: #C0C0C0;
+            border: 3px outset #FFF;
+            padding: 8px 20px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            width: 320px;
+            text-align: center;
+        }
+
+        canvas {
+            background: #87CEEB;
+            border: 3px outset #FFF;
+            border-bottom: 5px solid #228B22;
+            image-rendering: pixelated;
+        }
+
+        .controles {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 25px;
+            background: #C0C0C0;
+            border: 3px outset #FFF;
+            font-size: 16px;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .btn:active { border-style: inset; }
+
+        .instrucoes {
+            margin-top: 10px;
+            font-size: 12px;
+            color: white;
+            text-shadow: 1px 1px 0 black;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🤖 Jogo do Robô — Richard 🌟</h1>
+
+<div class="placar">
+    Pontos: <span id="pontos">0</span> | ⭐ Estrelas: <span id="estrelas">0</span>
+</div>
+
+<canvas id="jogo" width="400" height="300"></canvas>
+
+<div class="controles">
+    <button class="btn" id="esquerda">⬅️</button>
+    <button class="btn" id="pular">⬆️ PULAR</button>
+    <button class="btn" id="direita">➡️</button>
+</div>
+
+<div class="instrucoes">
+    Use as setas ou toque nos botões • Pegue as estrelas ⭐ e evite os inimigos 👾
+</div>
+
+<script>
+const tela = document.getElementById('jogo');
+const ctx = tela.getContext('2d');
+
+// Personagem
+const jogador = {
+    x: 50,
+    y: 230,
+    largura: 32,
+    altura: 40,
+    velocidade: 5,
+    dy: 0,
+    pulando: false,
+    cor: '#FF4444'
+};
+
+// Plataformas
+const plataformas = [
+    { x: 0, y: 260, largura: 400, altura: 40, cor: '#228B22' },
+    { x: 100, y: 200, largura: 100, altura: 20, cor: '#8B4513' },
+    { x: 280, y: 160, largura: 100, altura: 20, cor: '#8B4513' },
+    { x: 50, y: 120, largura: 80, altura: 20, cor: '#8B4513' }
+];
+
+// Estrelas
+const estrelas = [
+    { x: 130, y: 170, pega: false },
+    { x: 310, y: 130, pega: false },
+    { x: 70, y: 90, pega: false }
+];
+
+// Inimigos
+const inimigos = [
+    { x: 200, y: 230, largura: 25, altura: 25, velocidade: 1, min: 150, max: 350 }
+];
+
+let pontos = 0;
+let qtdEstrelas = 0;
+let tecla = { esq: false, dir: false, pula: false };
+
+// Controles — Teclado
+document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') tecla.esq = true;
+    if (e.key === 'ArrowRight') tecla.dir = true;
+    if (e.key === ' ' || e.key === 'ArrowUp') tecla.pula = true;
+});
+document.addEventListener('keyup', e => {
+    if (e.key === 'ArrowLeft') tecla.esq = false;
+    if (e.key === 'ArrowRight') tecla.dir = false;
+    if (e.key === ' ' || e.key === 'ArrowUp') tecla.pula = false;
+});
+
+// Controles — Toque / Celular
+document.getElementById('esquerda').addEventListener('touchstart', ()=>tecla.esq=true);
+document.getElementById('esquerda').addEventListener('touchend', ()=>tecla.esq=false);
+document.getElementById('direita').addEventListener('touchstart', ()=>tecla.dir=true);
+document.getElementById('direita').addEventListener('touchend', ()=>tecla.dir=false);
+document.getElementById('pular').addEventListener('touchstart', ()=>tecla.pula=true);
+document.getElementById('pular').addEventListener('touchend', ()=>tecla.pula=false);
+
+// Física do pulo
+function pular() {
+    if (!jogador.pulando) {
+        jogador.dy = -12;
+        jogador.pulando = true;
+    }
+}
+
+// Atualizar jogo
+function atualizar() {
+    // Movimento
+    if (tecla.dir && jogador.x + jogador.largura < tela.width) jogador.x += jogador.velocidade;
+    if (tecla.esq && jogador.x > 0) jogador.x -= jogador.velocidade;
+    if (tecla.pula) pular();
+
+    // Gravidade
+    jogador.dy += 0.6;
+    jogador.y += jogador.dy;
+
+    // Colisão com plataformas
+    jogador.pulando = true;
+    for (let p of plataformas) {
+        if (jogador.x + jogador.largura > p.x &&
+            jogador.x < p.x + p.largura &&
+            jogador.y + jogador.altura > p.y &&
+            jogador.y + jogador.altura < p.y + p.altura + 10 &&
+            jogador.dy >= 0) {
+            jogador.y = p.y - jogador.altura;
+            jogador.dy = 0;
+            jogador.pulando = false;
+        }
+    }
+
+    // Pegar estrelas
+    for (let e of estrelas) {
+        if (!e.pega &&
+            jogador.x + jogador.largura > e.x &&
+            jogador.x < e.x + 24 &&
+            jogador.y + jogador.altura > e.y &&
+            jogador.y < e.y + 24) {
+            e.pega = true;
+            pontos += 10;
+            qtdEstrelas++;
+            atualizarPlacar();
+        }
+    }
+
+    // Inimigo anda
+    for (let i of inimigos) {
+        i.x += i.velocidade;
+        if (i.x <= i.min || i.x + i.largura >= i.max) i.velocidade *= -1;
+
+        // Bateu no inimigo?
+        if (jogador.x + jogador.largura > i.x &&
+            jogador.x < i.x + i.largura &&
+            jogador.y + jogador.altura > i.y &&
+            jogador.y < i.y + i.altura) {
+            pontos = Math.max(0, pontos - 5);
+            jogador.x = 50; jogador.y = 230; jogador.dy = 0;
+            atualizarPlacar();
+        }
+    }
+
+    // Ganhou?
+    if (qtdEstrelas === 3) {
+        setTimeout(() => {
+            alert('🎉 PARABÉNS RICHARD! Você coletou todas as estrelas! 🌟🏆');
+            // Reiniciar
+            pontos = 0; qtdEstrelas = 0;
+            estrelas.forEach(e => e.pega = false);
+            jogador.x = 50; jogador.y = 230;
+            atualizarPlacar();
+        }, 100);
+    }
+}
+
+function atualizarPlacar() {
+    document.getElementById('pontos').textContent = pontos;
+    document.getElementById('estrelas').textContent = qtdEstrelas + '/3';
+}
+
+// Desenhar tudo
+function desenhar() {
+    // Fundo
+    ctx.fillStyle = '#87CEEB';
+    ctx.fillRect(0, 0, tela.width, tela.height);
+
+    // Nuvens
+    ctx.fillStyle = 'white';
+    ctx.beginPath(); ctx.arc(60, 50, 25, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(340, 70, 30, 0, Math.PI*2); ctx.fill();
+
+    // Plataformas
+    for (let p of plataformas) {
+        ctx.fillStyle = p.cor;
+        ctx.fillRect(p.x, p.y, p.largura, p.altura);
+    }
+
+    // Estrelas
+    for (let e of estrelas) {
+        if (!e.pega) {
+            ctx.font = '24px Arial';
+            ctx.fillText('⭐', e.x, e.y + 20);
+        }
+    }
+
+    // Inimigo
+    ctx.font = '25px Arial';
+    for (let i of inimigos) {
+        ctx.fillText('👾', i.x, i.y + 22);
+    }
+
+    // Jogador — Robô
+    ctx.fillStyle = jogador.cor;
+    ctx.fillRect(jogador.x + 4, jogador.y, 24, 20); // Cabeça
+    ctx.fillRect(jogador.x + 8, jogador.y + 20, 16, 15); // Corpo
+    ctx.fillStyle = '#FFD700';
+    ctx.fillRect(jogador.x + 6, jogador.y + 5, 5, 5); // Olho
+    ctx.fillRect(jogador.x + 20, jogador.y + 5, 5, 5); // Olho
+    ctx.fillStyle = '#333';
+    ctx.fillRect(jogador.x + 8, jogador.y + 35, 6, 5); // Pé
+    ctx.fillRect(jogador.x + 18, jogador.y + 35, 6, 5); // Pé
+}
+
+// Loop do jogo
+function loop() {
+    atualizar();
+    desenhar();
+    requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+
+</body>
+</html>

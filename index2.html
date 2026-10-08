@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja de Jogos — Richard 1998</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "MS Sans Serif", Tahoma, sans-serif; }
+        body {
+            background: #008080;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .janela {
+            background: #C0C0C0;
+            border: 3px outset #FFFFFF;
+            max-width: 750px;
+            margin: 0 auto;
+            box-shadow: 4px 4px rgba(0,0,0,0.4);
+        }
+        .barra-titulo {
+            background: linear-gradient(90deg, #000080, #1084D0);
+            color: white;
+            padding: 4px 8px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+        .botoes-janela { display: flex; gap: 3px; }
+        .btn-janela {
+            width: 18px; height: 18px;
+            background: #C0C0C0;
+            border: 2px outset #FFFFFF;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        .btn-janela:active { border-style: inset; }
+
+        .menu {
+            padding: 3px 5px;
+            border-bottom: 2px inset #FFFFFF;
+            font-size: 12px;
+        }
+        .menu span { padding: 2px 8px; cursor: pointer; }
+        .menu span:hover { background: #000080; color: white; }
+
+        .pesquisa {
+            padding: 10px;
+            border-bottom: 2px inset #FFFFFF;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .pesquisa input {
+            flex: 1;
+            min-width: 200px;
+            padding: 5px;
+            border: 2px inset #FFFFFF;
+            font-size: 13px;
+        }
+        .btn {
+            padding: 5px 15px;
+            background: #C0C0C0;
+            border: 3px outset #FFFFFF;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .btn:active { border-style: inset; }
+
+        .conteudo { padding: 15px; }
+        .grade {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+        }
+        .jogo {
+            background: #C0C0C0;
+            border: 2px outset #FFFFFF;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .jogo:hover { border-style: inset; background: #D4D4D4; }
+        .jogo-emoji { font-size: 40px; margin-bottom: 5px; }
+        .jogo-nome { font-weight: bold; font-size: 13px; margin-bottom: 5px; }
+        .jogo-preco { color: green; font-weight: bold; font-size: 12px; margin-bottom: 10px; }
+        
+        .btn-selecionar {
+            padding: 4px 12px;
+            background: #C0C0C0;
+            border: 2px outset #FFFFFF;
+            font-size: 11px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-selecionar:active { border-style: inset; }
+        .btn-selecionar.selecionado {
+            background: #00AA00;
+            color: white;
+            border-style: inset;
+        }
+
+        .area-play {
+            margin-top: 20px;
+            padding: 15px;
+            border-top: 2px inset #FFFFFF;
+            text-align: center;
+            display: none;
+        }
+        .btn-play {
+            padding: 12px 40px;
+            background: #008000;
+            border: 3px outset #00FF00;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+        }
+        .btn-play:active { border-style: inset; }
+
+        .rodape {
+            padding: 5px 10px;
+            border-top: 2px inset #FFFFFF;
+            font-size: 11px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="janela">
+    <div class="barra-titulo">
+        🎮 Loja de Jogos — Richard 1998
+        <div class="botoes-janela">
+            <button class="btn-janela">_</button>
+            <button class="btn-janela">□</button>
+            <button class="btn-janela">×</button>
+        </div>
+    </div>
+
+    <div class="menu">
+        <span>Arquivo</span>
+        <span>Ver</span>
+        <span>Ajuda</span>
+    </div>
+
+    <div class="pesquisa">
+        <input type="text" id="busca" placeholder="🔍 Digite o nome do jogo...">
+        <button class="btn" onclick="pesquisar()">Pesquisar</button>
+        <button class="btn" onclick="limpar()">Todos</button>
+    </div>
+
+    <div class="conteudo">
+        <div class="grade" id="lista-jogos">
+            <div class="jogo" data-nome="Jogo 1 Aventura">
+                <div class="jogo-emoji">🏃</div>
+                <div class="jogo-nome">Jogo 1 — Aventura</div>
+                <div class="jogo-preco">Grátis ✅</div>
+                <button class="btn-selecionar" onclick="selecionar(this)">Escolher</button>
+            </div>
+            <div class="jogo" data-nome="Jogo 2 Robô">
+                <div class="jogo-emoji">🤖</div>
+                <div class="jogo-nome">Jogo 2 — Robô</div>
+                <div class="jogo-preco">Grátis ✅</div>
+                <button class="btn-selecionar" onclick="selecionar(this)">Escolher</button>
+            </div>
+            <div class="jogo" data-nome="Jogo 3 Plataforma">
+                <div class="jogo-emoji">⬆️</div>
+                <div class="jogo-nome">Jogo 3 — Plataforma</div>
+                <div class="jogo-preco">Grátis ✅</div>
+                <button class="btn-selecionar" onclick="selecionar(this)">Escolher</button>
+            </div>
+            <div class="jogo" data-nome="Jogo 4 Espaço">
+                <div class="jogo-emoji">🚀</div>
+                <div class="jogo-nome">Jogo 4 — Espaço</div>
+                <div class="jogo-preco">Grátis ✅</div>
+                <button class="btn-selecionar" onclick="selecionar(this)">Escolher</button>
+            </div>
+            <div class="jogo" data-nome="Jogo 5 Mundo">
+                <div class="jogo-emoji">🌍</div>
+                <div class="jogo-nome">Jogo 5 — Mundo</div>
+                <div class="jogo-preco">Grátis ✅</div>
+                <button class="btn-selecionar" onclick="selecionar(this)">Escolher</button>
+            </div>
+            <div class="jogo" data-nome="Jogo 6 Herói">
+                <div class="jogo-emoji">🦸</div>
+                <div class="jogo-nome">Jogo 6 — Herói</div>
+                <div class="jogo-preco">Grátis ✅</div>
+                <button class="btn-selecionar" onclick="selecionar(this)">Escolher</button>
+            </div>
+        </div>
+
+        <div class="area-play" id="areaPlay">
+            <p style="margin-bottom: 10px; font-weight: bold;">✨ Jogo escolhido! ✨</p>
+            <button class="btn-play" onclick="jogar()">▶️ PLAY</button>
+        </div>
+    </div>
+
+    <div class="rodape">
+        © 1998 Richard — Loja de Jogos 💙
+    </div>
+</div>
+
+<script>
+let jogoEscolhido = null;
+
+function selecionar(botao) {
+    // Tirar seleção de todos
+    document.querySelectorAll('.btn-selecionar').forEach(btn => {
+        btn.classList.remove('selecionado');
+        btn.innerText = 'Escolher';
+    });
+    
+    // Marcar o escolhido
+    botao.classList.add('selecionado');
+    botao.innerText = '✓ Escolhido!';
+    jogoEscolhido = botao.closest('.jogo');
+    
+    // Mostrar botão PLAY
+    document.getElementById('areaPlay').style.display = 'block';
+}
+
+function jogar() {
+    window.location.href = 'index5.html';
+}
+
+function pesquisar() {
+    const termo = document.getElementById('busca').value.toLowerCase().trim();
+    const jogos = document.querySelectorAll('.jogo');
+    let encontrados = 0;
+
+    jogos.forEach(jogo => {
+        const nome = jogo.getAttribute('data-nome').toLowerCase();
+        if (termo === '' || nome.includes(termo)) {
+            jogo.style.display = 'block';
+            encontrados++;
+        } else {
+            jogo.style.display = 'none';
+        }
+    });
+}
+
+function limpar() {
+    document.getElementById('busca').value = '';
+    document.querySelectorAll('.jogo').forEach(jogo => {
+        jogo.style.display = 'block';
+    });
+}
+
+document.getElementById('busca').addEventListener('keypress', e => {
+    if (e.key === 'Enter') pesquisar();
+});
+</script>
+
+</body>
+</html>
